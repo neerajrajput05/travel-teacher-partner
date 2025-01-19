@@ -1,0 +1,9 @@
+{
+  "baseUrl": "https://travelteachergroup.com:8081/",
+  "countryId": 91,
+  "countryPartner": "",
+  "app_variant": "MyTaxiDriver",
+  "mode": "release",
+  "token": "c031492656c179bb54d1fa6f063a56e9",
+  "is_encrypted": false
+}

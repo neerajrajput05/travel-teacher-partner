@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "633383824112",
+    "firebase_url": "https://my-taxi-customer-c4c9b-default-rtdb.firebaseio.com",
+    "project_id": "my-taxi-customer-c4c9b",
+    "storage_bucket": "my-taxi-customer-c4c9b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633383824112:android:a1cedd9f6677c104147035",
+        "android_client_info": {
+          "package_name": "com.ideativemind.customer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMRryPgY1DJOc7a7sp81Y88oBhmXkDLR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633383824112:android:badaa2a6c178c5c0147035",
+        "android_client_info": {
+          "package_name": "com.travel.teacher"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMRryPgY1DJOc7a7sp81Y88oBhmXkDLR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
