@@ -1,0 +1,72 @@
+config.json
+# Flutter specific
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.packages
+.dart_tool/
+.build/
+.macos/
+.idea/
+android/.gradle/
+android/app/debug.keystore
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/*.xcodeproj/project.pbxproj
+ios/Flutter/*.xcodeproj/xcuserdata/
+ios/Flutter/*.xcworkspace/contents.xcworkspacedata
+ios/Flutter/*.xcworkspace/xcuserdata/
+ios/.symlinks/
+ios/Pods/
+ios/Podfile.lock
+linux/flutter/
+linux/cmake-build-debug/
+web/.dart_tool/
+web/.flutter-plugins-dependencies
+windows/flutter/
+windows/cmake-build-debug/
+*.iml
+
+# Dependency directories
+build/
+**/build/
+android/app/src/debug/
+android/app/src/profile/
+
+# IntelliJ IDE-specific
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/modules.xml
+
+# VS Code-specific
+.vscode/
+*.code-workspace
+
+# macOS
+.DS_Store
+
+# Temporary Files
+*.log
+*.lock
+*.tmp
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Generated files
+pubspec.lock
+*.g.dart
+*.mocks.dart
+
+# Flutter test results
+test-output/
+
+# Others
+config.json  # Sensitive configuration
+*.key        # Key files (e.g., API keys)
