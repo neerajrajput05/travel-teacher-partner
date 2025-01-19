@@ -1,6 +1,7 @@
 import 'package:driver/constant_widgets/app_bar_with_border.dart';
 import 'package:driver/constant_widgets/country_code_selector_view.dart';
 import 'package:driver/constant_widgets/round_shape_button.dart';
+import 'package:driver/constant_widgets/show_toast_dialog.dart';
 import 'package:driver/constant_widgets/text_field_with_title.dart';
 import 'package:driver/theme/app_them_data.dart';
 import 'package:driver/theme/responsive.dart';
@@ -126,8 +127,81 @@ class EditProfileView extends StatelessWidget {
                       prefixIcon: const Icon(Icons.email_outlined),
                       keyboardType: TextInputType.emailAddress,
                       controller: controller.emailController,
-                      isEnable: true,
+                      isEnable: !controller.isEmailVerified.value,
                     ),
+                    (controller.isEmailVerified.value)
+                        ? const SizedBox.shrink()
+                        : Align(
+                            alignment: Alignment.topRight,
+                            child: InkWell(
+                              onTap: () {
+                                if (controller.emailController.text.isEmpty) {
+                                  ShowToastDialog.showToast(
+                                      'Please enter a valid email address.');
+                                  return;
+                                }
+                                controller.sendVerifyEmail().then((value) {
+                                  if (value) {
+                                    controller.otpController.text = "";
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Verify Email".tr),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                  "Please check your email for OTP."
+                                                      .tr),
+                                              const SizedBox(height: 20),
+                                              TextField(
+                                                controller:
+                                                    controller.otpController,
+                                                decoration: InputDecoration(
+                                                  labelText: "Enter OTP".tr,
+                                                  border:
+                                                      const OutlineInputBorder(),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text("Verify".tr),
+                                              onPressed: () {
+                                                if (controller.otpController
+                                                    .text.isEmpty) {
+                                                  ShowToastDialog.showToast(
+                                                      'Please enter OTP');
+                                                  return;
+                                                }
+                                                ShowToastDialog.showLoader(
+                                                    "Please wait");
+                                                controller.verifyEmailOTP(
+                                                    controller
+                                                        .emailController.text,
+                                                    controller
+                                                        .otpController.text);
+                                                Navigator.of(context).pop();
+                                                ShowToastDialog.closeLoader();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
+                                });
+                              },
+                              child: Text("Verify Email".tr,
+                                  style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      color: AppThemData.primary400,
+                                      fontWeight: FontWeight.w500)),
+                            ),
+                          ),
                     const SizedBox(height: 20),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,

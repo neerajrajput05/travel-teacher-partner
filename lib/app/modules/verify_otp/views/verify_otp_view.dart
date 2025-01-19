@@ -226,6 +226,7 @@ class VerifyOtpView extends StatelessWidget {
                                       controller.phoneNumber.value;
                                   userModel.loginType = Constant.phoneLoginType;
                                   userModel.fcmToken = responseData['token'];
+                                  await Preferences.setDriverUserModel(userModel);
                                   ShowToastDialog.closeLoader();
                                   Get.off(const SignupView(), arguments: {
                                     "userModel": userModel,
@@ -240,6 +241,7 @@ class VerifyOtpView extends StatelessWidget {
                                       controller.phoneNumber.value;
                                   userModel.loginType = Constant.phoneLoginType;
                                   userModel.fcmToken = responseData['token'];
+                                  await Preferences.setDriverUserModel(userModel);
                                   ShowToastDialog.closeLoader();
                                   Get.off(
                                       const VerifyDocumentsView(
@@ -249,6 +251,15 @@ class VerifyOtpView extends StatelessWidget {
                                         "userModel": userModel,
                                       });
                                 } else {
+                                  DriverUserModel userModel = DriverUserModel();
+                                  userModel.id = responseData['id'];
+                                  userModel.countryCode =
+                                      controller.countryCode.value;
+                                  userModel.phoneNumber =
+                                      controller.phoneNumber.value;
+                                  userModel.loginType = Constant.phoneLoginType;
+                                  userModel.fcmToken = responseData['token'];
+                                  await Preferences.setDriverUserModel(userModel);
                                   bool permissionGiven =
                                       await Constant.isPermissionApplied();
                                   Preferences.setDocVerifyStatus(true);

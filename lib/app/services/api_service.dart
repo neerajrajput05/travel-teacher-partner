@@ -330,7 +330,7 @@ Future<Map<String, dynamic>> getVehicleTypeDetail() async {
 //     return isUpdate;
 //   }
 
-Future<bool> uploadDriverDocumentImageToStorage(DocsModel model) async {
+Future<String> uploadDriverDocumentImageToStorage(DocsModel model) async {
   final endPoint = await Preferences.isOwnerLogin()
       ? updloadOwnerDocumentEndpoint
       : updloadDocumentEndpoint;
@@ -357,9 +357,9 @@ Future<bool> uploadDriverDocumentImageToStorage(DocsModel model) async {
       }
     }
 
-    return true;
+    return jsonDecode(response.body)["msg"];
   } else {
-    return false;
+    return jsonDecode(response.body)["msg"];
   }
 }
 
@@ -387,6 +387,22 @@ Future<bool> updateCurrentLocationAPI(String latitude, String longitude) async {
   } else {
     return false;
   }
+}
+
+Future<Map<String, dynamic>> uploadProfilePicture(String image) async {
+  Map<String, dynamic> map = {
+    "profile": image,
+  };
+
+  String token = await Preferences.getFcmToken();
+
+  final response = await http.put(
+    Uri.parse(baseURL + updloadProfileImageEndpoint),
+    headers: {"Content-Type": "application/json", "token": token},
+    body: jsonEncode(map),
+  );
+
+  return jsonDecode(response.body);
 }
 
 Future<bool> saveUserModelOnline(DriverUserModel model) async {
@@ -795,5 +811,41 @@ Future<Map<String, dynamic>> createSupportTicketAPI(
   } else {
     throw Exception(
         'Failed to create support ticket: ${response.reasonPhrase}');
+  }
+}
+
+Future<Map<String, dynamic>> sendVerifyEmailAPI(String email) async {
+  String endPoint = verifySendEmail;
+
+  Map<String, dynamic> params = {"email_address": email};
+
+  String uToken = await Preferences.getFcmToken();
+  final response = await http.post(
+    Uri.parse(baseURL + endPoint),
+    headers: {
+      "Content-Type": "application/json",
+      "token": uToken,
+    },
+    body: jsonEncode(params),
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception('Failed to send verify email: ${response.reasonPhrase}');
+  }
+}
+
+Future<Map<String, dynamic>> verifyEmailOTPAPI(String email, String otp) async {
+  String endPoint = verifyEmailOTP;
+  Map<String, dynamic> params = {"email_address": email, "otp": otp};
+  String uToken = await Preferences.getFcmToken();
+  final response = await http.put(Uri.parse(baseURL + endPoint),
+      headers: {"Content-Type": "application/json", "token": uToken},
+      body: jsonEncode(params));
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception('Failed to verify email OTP: ${response.reasonPhrase}');
   }
 }

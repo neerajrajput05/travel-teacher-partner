@@ -7,11 +7,14 @@ import 'package:driver/app/services/api_service.dart';
 import 'package:driver/constant_widgets/round_shape_button.dart';
 import 'package:driver/constant_widgets/show_toast_dialog.dart';
 import 'package:driver/theme/app_them_data.dart';
+import 'package:driver/theme/responsive.dart';
 import 'package:driver/utils/preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/verify_documents_controller.dart';
 
@@ -51,78 +54,121 @@ class VerifyDocumentsView extends GetView<VerifyDocumentsController> {
             ),
             floatingActionButton: isFromDrawer
                 ? null
-                : RoundShapeButton(
-                    size: const Size(200, 45),
-                    title: "Check Status".tr,
-                    buttonColor: AppThemData.primary500,
-                    buttonTextColor: AppThemData.black,
-                    onTap: () async {
-                      if (await Preferences.getUserLoginStatus()) {
-                        try {
-                          final response = await getCheckStatusAPi();
-                          if (response["status"]) {
-                            Preferences.setDocVerifyStatus(true);
-                            Get.offAll(const HomeView());
-                          } else {
-                            ShowToastDialog.showToast(response["msg"]);
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CheckboxListTile(
+                        title: Text("Agree with Travel Teacher".tr),
+                        value:
+                            controller.userModel.value.isTermsAccepted ?? false,
+                        onChanged: (bool? value) {
+                          controller.userModel.value.isTermsAccepted = value!;
+                          controller.update();
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                      ),
+                      if (true)
+                        InkWell(
+                          onTap: () async {
+                            final url = "https://pdfobject.com/pdf/sample.pdf";
+                            if (await canLaunchUrl(Uri.parse(url))) {
+                              await launchUrl(Uri.parse(url),
+                                  mode: LaunchMode.externalApplication);
+                            } else {
+                              throw 'Could not launch $url';
+                            }
+                          },
+                          child: Text(
+                            "View Terms and Conditions".tr,
+                            style: GoogleFonts.inter(
+                              color: AppThemData.primary500,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                      RoundShapeButton(
+                        size: const Size(200, 45),
+                        title: "Check Status".tr,
+                        buttonColor: AppThemData.primary500,
+                        buttonTextColor: AppThemData.black,
+                        onTap: () async {
+                          if (controller.userModel.value.isTermsAccepted !=
+                              true) {
+                            ShowToastDialog.showToast(
+                                "Kindly accept term and contion");
+                            return;
                           }
-                        } catch (e) {
-                          ShowToastDialog.showToast(e.toString());
-                        }
+                          if (await Preferences.getUserLoginStatus()) {
+                            try {
+                              final response = await getCheckStatusAPi();
+                              if (response["status"]) {
+                                Preferences.setDocVerifyStatus(true);
+                                Get.offAll(const HomeView());
+                              } else {
+                                ShowToastDialog.showToast(response["msg"]);
+                              }
+                            } catch (e) {
+                              ShowToastDialog.showToast(e.toString());
+                            }
 
-                        DriverUserModel? userModel = await getOnlineUserModel();
-                        if (userModel.driverVehicleDetails != null &&
-                            userModel
-                                .driverVehicleDetails!.modelId!.isNotEmpty) {
-                          Preferences.setDriverUserModel(userModel);
-                          // ShowToastDialog.showLoader("Please wait");
-                          // await controller.getData();
+                            DriverUserModel? userModel =
+                                await getOnlineUserModel();
+                            if (userModel.driverVehicleDetails != null &&
+                                userModel.driverVehicleDetails!.modelId!
+                                    .isNotEmpty) {
+                              Preferences.setDriverUserModel(userModel);
+                              // ShowToastDialog.showLoader("Please wait");
+                              // await controller.getData();
 
-                          // bool isUserVerified = userModel!.isVerified ?? false;
-                          // bool isVehicleDetailsVerified =
-                          //     userModel.driverVehicleDetails!.isVerified ??
-                          //         false;
-                          // int? index = userModel!.driverdDocs?.indexWhere(
-                          //     (element) => element.isVerify == false);
-                          // bool isDocumentVerified = index == -1;
-                          // if (isUserVerified &&
-                          //     isVehicleDetailsVerified &&
-                          //     isDocumentVerified) {
-                          //   controller.isVerified.value = true;
-                          //   Preferences.setDocVerifyStatus(true);
-                          //   bool permissionGiven =
-                          //       await Constant.isPermissionApplied();
-                          //   if (permissionGiven) {
-                          //     Get.offAll(const HomeView());
-                          //   } else {
-                          //     Get.offAll(const PermissionView());
-                          //   }
-                          // } else {
-                          //   controller.isVerified.value = false;
-                          //   if (!isUserVerified) {
-                          //     ShowToastDialog.showToast(
-                          //         "User disabled by administrator, Please contact to admin");
-                          //   }
-                          // }
-                          ShowToastDialog.closeLoader();
-                        } else {
-                          ShowToastDialog.showToast(
-                              "Upload all required documents.".tr);
-                        }
-                      } else {
-                        try {
-                          final response = await getCheckStatusAPi();
-                          if (response["status"]) {
-                            Preferences.setDocVerifyStatus(true);
-                            Get.offAll(const HomeOwnerView());
+                              // bool isUserVerified = userModel!.isVerified ?? false;
+                              // bool isVehicleDetailsVerified =
+                              //     userModel.driverVehicleDetails!.isVerified ??
+                              //         false;
+                              // int? index = userModel!.driverdDocs?.indexWhere(
+                              //     (element) => element.isVerify == false);
+                              // bool isDocumentVerified = index == -1;
+                              // if (isUserVerified &&
+                              //     isVehicleDetailsVerified &&
+                              //     isDocumentVerified) {
+                              //   controller.isVerified.value = true;
+                              //   Preferences.setDocVerifyStatus(true);
+                              //   bool permissionGiven =
+                              //       await Constant.isPermissionApplied();
+                              //   if (permissionGiven) {
+                              //     Get.offAll(const HomeView());
+                              //   } else {
+                              //     Get.offAll(const PermissionView());
+                              //   }
+                              // } else {
+                              //   controller.isVerified.value = false;
+                              //   if (!isUserVerified) {
+                              //     ShowToastDialog.showToast(
+                              //         "User disabled by administrator, Please contact to admin");
+                              //   }
+                              // }
+                              ShowToastDialog.closeLoader();
+                            } else {
+                              ShowToastDialog.showToast(
+                                  "Upload all required documents.".tr);
+                            }
                           } else {
-                            ShowToastDialog.showToast(response["msg"]);
+                            try {
+                              final response = await getCheckStatusAPi();
+                              if (response["status"]) {
+                                Preferences.setDocVerifyStatus(true);
+                                Get.offAll(const HomeOwnerView());
+                              } else {
+                                ShowToastDialog.showToast(response["msg"]);
+                              }
+                            } catch (e) {
+                              ShowToastDialog.showToast(e.toString());
+                            }
                           }
-                        } catch (e) {
-                          ShowToastDialog.showToast(e.toString());
-                        }
-                      }
-                    },
+                        },
+                      ),
+                    ],
                   ),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
@@ -161,172 +207,221 @@ class VerifyDocumentsView extends GetView<VerifyDocumentsController> {
                       ),
                     ),
                     const SizedBox(height: 28),
+                    InkWell(
+                      onTap: () {
+                        buildBottomSheet(context, 0);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 15,
+                            backgroundColor: AppThemData.grey200,
+                            child: controller.userModel.value.profilePic !=
+                                        null &&
+                                    controller.userModel.value.profilePic != ""
+                                ? const Icon(
+                                    Icons.done,
+                                    color: AppThemData.bookingCompleted,
+                                  )
+                                : const Icon(
+                                    Icons.camera_alt,
+                                    color: AppThemData.white,
+                                  ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Upload Profile Picture',
+                            style: GoogleFonts.inter(
+                              color: AppThemData.grey950,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Divider(
+                      color: AppThemData.grey100,
+                      thickness: 1,
+                      height: 20,
+                    ),
                     Obx(
                       () => (!controller.isOwner.value)
                           ? InkWell(
                               onTap: () {
                                 Get.to(UpdateVehicleDetailsView(
-                            isUploaded:
-                                controller.userModel.value.driverVehicleDetails !=
-                                    null,
-                          ));
-                        },
-                        child: Obx(
-                          () => Container(
-                            padding:
-                                controller.userModel.value.driverVehicleDetails !=
-                                        null
-                                    ? const EdgeInsets.all(16)
-                                    : EdgeInsets.zero,
-                            decoration: ShapeDecoration(
-                              color: controller
-                                          .userModel.value.driverVehicleDetails !=
-                                      null
-                                  ? AppThemData.primary50
-                                  : AppThemData.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
+                                  isUploaded: controller.userModel.value
+                                          .driverVehicleDetails !=
+                                      null,
+                                ));
+                              },
+                              child: Obx(
+                                () => Container(
                                   padding: controller.userModel.value
-                                              .driverVehicleDetails ==
+                                              .driverVehicleDetails !=
                                           null
-                                      ? const EdgeInsets.only(top: 16, bottom: 16)
+                                      ? const EdgeInsets.all(16)
                                       : EdgeInsets.zero,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                  decoration: ShapeDecoration(
+                                    color: controller.userModel.value
+                                                .driverVehicleDetails !=
+                                            null
+                                        ? AppThemData.primary50
+                                        : AppThemData.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      controller.userModel.value
-                                                  .driverVehicleDetails !=
-                                              null
-                                          ? SvgPicture.asset(
-                                              "assets/icon/ic_vehicle_details.svg")
-                                          : Icon(
-                                              Icons.add,
-                                              color: AppThemData.primary500,
-                                            ),
-                                      const SizedBox(width: 18),
-                                      Expanded(
-                                        child: Column(
+                                      Padding(
+                                        padding: controller.userModel.value
+                                                    .driverVehicleDetails ==
+                                                null
+                                            ? const EdgeInsets.only(
+                                                top: 16, bottom: 16)
+                                            : EdgeInsets.zero,
+                                        child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                              MainAxisAlignment.spaceBetween,
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                              CrossAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              controller.userModel.value
+                                            controller.userModel.value
+                                                        .driverVehicleDetails !=
+                                                    null
+                                                ? SvgPicture.asset(
+                                                    "assets/icon/ic_vehicle_details.svg")
+                                                : Icon(
+                                                    Icons.add,
+                                                    color:
+                                                        AppThemData.primary500,
+                                                  ),
+                                            const SizedBox(width: 18),
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    controller.userModel.value
+                                                                .driverVehicleDetails !=
+                                                            null
+                                                        ? 'Vehicle Details'.tr
+                                                        : 'Add Your Vehicle Details'
+                                                            .tr,
+                                                    style: GoogleFonts.inter(
+                                                      color:
+                                                          AppThemData.grey950,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  if (controller.userModel.value
                                                           .driverVehicleDetails !=
-                                                      null
-                                                  ? 'Vehicle Details'.tr
-                                                  : 'Add Your Vehicle Details'.tr,
-                                              style: GoogleFonts.inter(
-                                                color: AppThemData.grey950,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
+                                                      null) ...{
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "Uploaded",
+                                                          style:
+                                                              GoogleFonts.inter(
+                                                            color: (controller
+                                                                        .userModel
+                                                                        .value
+                                                                        .driverVehicleDetails!
+                                                                        .isVerified ??
+                                                                    false)
+                                                                ? AppThemData
+                                                                    .success500
+                                                                : AppThemData
+                                                                    .danger500,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                            width: 16,
+                                                            height: 16,
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    left: 7),
+                                                            clipBehavior:
+                                                                Clip.antiAlias,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          16),
+                                                              color: (controller
+                                                                          .userModel
+                                                                          .value
+                                                                          .driverVehicleDetails!
+                                                                          .isVerified ??
+                                                                      false)
+                                                                  ? AppThemData
+                                                                      .success500
+                                                                  : AppThemData
+                                                                      .danger500,
+                                                            ),
+                                                            child: Icon(
+                                                              (controller
+                                                                          .userModel
+                                                                          .value
+                                                                          .driverVehicleDetails!
+                                                                          .isVerified ??
+                                                                      false)
+                                                                  ? Icons.check
+                                                                  : Icons.close,
+                                                              size: 12,
+                                                              color: AppThemData
+                                                                  .white,
+                                                            ))
+                                                      ],
+                                                    )
+                                                  },
+                                                ],
                                               ),
                                             ),
                                             if (controller.userModel.value
                                                     .driverVehicleDetails !=
                                                 null) ...{
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    (controller
-                                                                .userModel
-                                                                .value
-                                                                .driverVehicleDetails!
-                                                                .isVerified ??
-                                                            false)
-                                                        ? 'Verified'.tr
-                                                        : 'Not Verified'.tr,
-                                                    style: GoogleFonts.inter(
-                                                      color: (controller
-                                                                  .userModel
-                                                                  .value
-                                                                  .driverVehicleDetails!
-                                                                  .isVerified ??
-                                                              false)
-                                                          ? AppThemData.success500
-                                                          : AppThemData.danger500,
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                      width: 16,
-                                                      height: 16,
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              left: 7),
-                                                      clipBehavior:
-                                                          Clip.antiAlias,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                16),
-                                                        color: (controller
-                                                                    .userModel
-                                                                    .value
-                                                                    .driverVehicleDetails!
-                                                                    .isVerified ??
-                                                                false)
-                                                            ? AppThemData
-                                                                .success500
-                                                            : AppThemData
-                                                                .danger500,
-                                                      ),
-                                                      child: Icon(
-                                                        (controller
-                                                                    .userModel
-                                                                    .value
-                                                                    .driverVehicleDetails!
-                                                                    .isVerified ??
-                                                                false)
-                                                            ? Icons.check
-                                                            : Icons.close,
-                                                        size: 12,
-                                                        color: AppThemData.white,
-                                                      ))
-                                                ],
+                                              const Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                                size: 20,
+                                                color: AppThemData.grey500,
                                               )
-                                            },
+                                            }
                                           ],
                                         ),
                                       ),
                                       if (controller.userModel.value
-                                              .driverVehicleDetails !=
+                                              .driverVehicleDetails ==
                                           null) ...{
-                                        const Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 20,
-                                          color: AppThemData.grey500,
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 40),
+                                          child: Divider(
+                                            color: AppThemData.grey100,
+                                          ),
                                         )
                                       }
                                     ],
                                   ),
                                 ),
-                                if (controller
-                                        .userModel.value.driverVehicleDetails ==
-                                    null) ...{
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 40),
-                                    child: Divider(
-                                      color: AppThemData.grey100,
-                                    ),
-                                  )
-                                }
-                              ],
-                            ),
-                          ),
-                        ),
-                      ):Container(),
+                              ),
+                            )
+                          : Container(),
                     ),
                     const SizedBox(height: 12),
                     Obx(
@@ -473,6 +568,61 @@ class VerifyDocumentsView extends GetView<VerifyDocumentsController> {
               ),
             ),
           );
+        });
+  }
+
+  buildBottomSheet(BuildContext context, int index) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return SizedBox(
+              height: Responsive.height(22, context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: Text(
+                      "please_select".tr,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                onPressed: () => controller.pickFile(
+                                    source: ImageSource.camera, index: index),
+                                icon: const Icon(
+                                  Icons.camera_alt,
+                                  size: 32,
+                                )),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 3),
+                              child: Text(
+                                "camera".tr,
+                                style: const TextStyle(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          });
         });
   }
 }

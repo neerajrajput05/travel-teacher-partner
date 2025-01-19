@@ -88,17 +88,17 @@ class SignupView extends StatelessWidget {
                                     ? null
                                     : 'This field required'.tr,
                           ),
-                          const SizedBox(height: 20),
-                          TextFieldWithTitle(
-                            title: "Email Address".tr,
-                            hintText: "Enter Email Address".tr,
-                            prefixIcon: const Icon(Icons.email_outlined),
-                            keyboardType: TextInputType.emailAddress,
-                            controller: controller.emailController,
-                            isEnable: true,
-                            validator: (value) =>
-                                Constant().validateEmail(value),
-                          ),
+                          // const SizedBox(height: 20),
+                          // TextFieldWithTitle(
+                          //   title: "Email Address".tr,
+                          //   hintText: "Enter Email Address".tr,
+                          //   prefixIcon: const Icon(Icons.email_outlined),
+                          //   keyboardType: TextInputType.emailAddress,
+                          //   controller: controller.emailController,
+                          //   isEnable: true,
+                          //   validator: (value) =>
+                          //       Constant().validateEmail(value),
+                          // ),
                           const SizedBox(height: 20),
                           TextFieldWithTitle(
                             title: "Phone Number".tr,
@@ -253,7 +253,7 @@ class SignupView extends StatelessWidget {
                                   }
                                 }),
                           ),
-                          ],
+                        ],
                       ),
                     ),
                   ),

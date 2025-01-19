@@ -87,6 +87,7 @@ class UpdateVehicleDetailsController extends GetxController {
       DriverUserModel? userModel = await Preferences.getDriverUserModel();
       if (userModel == null) {
         ShowToastDialog.closeLoader();
+        ShowToastDialog.showToast("Please login again.");
         return;
       }
       VerifyDocumentsController verifyDocumentsController =
@@ -102,11 +103,12 @@ class UpdateVehicleDetailsController extends GetxController {
         vehicleTypeId: vehicleTypeModel.value.id,
       );
       userModel.driverVehicleDetails = driverVehicleDetails;
+      await Preferences.setDriverUserModel(userModel);
       print("==> ${userModel.driverVehicleDetails!.toJson()}");
 
-      bool isUpdated = await FireStoreUtils.updateDriverUser(userModel);
+      // bool isUpdated = await FireStoreUtils.updateDriverUser(userModel);
       ShowToastDialog.closeLoader();
-      if (isUpdated) {
+      if (true) {
         ShowToastDialog.showToast(
             "Vehicle details updated, Please wait for verification.");
         verifyDocumentsController.getData();
@@ -116,6 +118,7 @@ class UpdateVehicleDetailsController extends GetxController {
         ShowToastDialog.showToast(
             "Something went wrong, Please try again later.");
         Get.back();
+        ShowToastDialog.closeLoader();
       }
     } catch (e) {
       ShowToastDialog.closeLoader();

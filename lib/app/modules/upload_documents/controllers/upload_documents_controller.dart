@@ -5,7 +5,9 @@ import 'dart:core';
 import 'dart:io';
 
 import 'package:driver/app/models/docsModel.dart';
+import 'package:driver/app/models/driver_user_model.dart';
 import 'package:driver/app/services/api_service.dart';
+import 'package:driver/utils/preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -136,16 +138,9 @@ class UploadDocumentsController extends GetxController {
         image: imageList,
         id: document.id);
 
-    bool isUpdated = await uploadDriverDocumentImageToStorage(docsModel);
+    String isUpdated = await uploadDriverDocumentImageToStorage(docsModel);
     ShowToastDialog.closeLoader();
-    if (isUpdated) {
-      ShowToastDialog.showToast(
-          "${document.title} updated, Please wait for verification.");
-      Get.back();
-    } else {
-      ShowToastDialog.showToast(
-          "Something went wrong, Please try again later.");
-      Get.back();
-    }
+    ShowToastDialog.showToast(isUpdated);
+    Get.back();
   }
 }

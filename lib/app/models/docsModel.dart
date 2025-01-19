@@ -26,13 +26,13 @@ class DocsModel {
   String toRawJson() => json.encode(toJson());
 
   factory DocsModel.fromJson(Map<String, dynamic> json) => DocsModel(
-        id: json["id"],
-        type: json["documentType"],
-        document_number: json["documentNumber"],
-        name: "",
-        date_of_birth: json["dateOfBirth"],
+        id: json["id"]??"",
+        type: json["documentType"]??json["type"]??"",
+        document_number: json["documentNumber"]??json["document_number"]??"",
+        name: json["name"]??"",
+        date_of_birth: json["dateOfBirth"]??"",
         isVerify: json["isVerified"] ?? true,
-        image: List<String>.from(json["images"]),
+        image: List<String>.from(json["images"]??[]),
       );
 
   Map<String, dynamic> toJson() => {

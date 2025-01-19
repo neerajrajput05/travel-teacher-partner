@@ -29,6 +29,7 @@ class DriverUserModel {
   dynamic rotation;
   String? reviewsCount;
   String? reviewsSum;
+  bool? isTermsAccepted;
   List<DocsModel>? driverdDocs = [];
 
   DriverUserModel({
@@ -56,6 +57,7 @@ class DriverUserModel {
     this.reviewsCount,
     this.reviewsSum,
     this.driverdDocs,
+    this.isTermsAccepted,
   });
 
   factory DriverUserModel.fromJson(Map<String, dynamic> json) =>
@@ -96,6 +98,7 @@ class DriverUserModel {
                 return model;
               })).toList()
             : [],
+        isTermsAccepted: json['isTermsAccepted'] ?? false,
       );
   factory DriverUserModel.fromAnotherJson(Map<String, dynamic> json) =>
       DriverUserModel(
@@ -124,6 +127,7 @@ class DriverUserModel {
                 return model;
               })).toList()
             : [],
+        isTermsAccepted: json['isTermsAccepted'] ?? false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -151,6 +155,7 @@ class DriverUserModel {
         'reviewsCount': reviewsCount ?? '0',
         'reviewsSum': reviewsSum ?? "0.0",
         'driverdDocs': driverdDocs?.map((e) => e.toJson()).toList(),
+        'isTermsAccepted': isTermsAccepted ?? false,
       };
 }
 
